@@ -1,0 +1,78 @@
+.taskContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  border-radius: 0.5rem;
+}
+
+.taskListHeader {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--blue);
+}
+
+.taskListHeader p + p {
+  color: var(--purple);
+}
+
+.taskListHeader strong {
+  padding: 0.2rem 0.5rem;
+  background: var(--gray-400);
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--gray-200);
+}
+
+.taskList {
+   display: flex;
+   flex-direction: column;
+   gap: 0.75rem;
+}
+
+.taskForm {
+  display: flex;
+  flex-direction: row;
+  gap: 0.75rem;
+}
+
+.taskForm input {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 1rem;
+
+  background: var(--gray-500);
+  border: 1px solid var(--gray-700);
+  order: 0;
+  flex-grow: 1;
+
+  border-radius: 0.5rem;
+  outline: none;
+
+  color: var(--gray-100);
+}
+
+.taskForm input:focus {
+  border: 1px solid var(--purple-dark);
+}
+
+.taskForm button {
+  padding: 1rem;
+  background: var(--blue-dark);
+  font-weight: 700;
+  border: none;
+  border-radius: 0.5rem;
+  color: var(--gray-100);
+
+  transition: 0.2s;
+}
+
+.taskForm button:hover {
+  background: var(--blue);
+}
