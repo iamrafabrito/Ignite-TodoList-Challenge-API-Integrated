@@ -1,28 +1,29 @@
-import { CheckCircle, Trash } from "phosphor-react";
+import {  Trash } from "phosphor-react";
 
 import styles from './Task.module.css';
 
 export interface ITask {
-  id: number;
+  _id?: string;
   description: string;
   status: boolean;
 }
 
 interface ITaskProps {
   task: ITask;
-  onDeleteTask: (id: number) => void;
-  onTaskStatusChange: (id: number) => void;
+  onDeleteTask: (id: string) => void;
+  onTaskStatusChange: (task: ITask) => void;
 }
 
 export function Task({ task, onDeleteTask, onTaskStatusChange }: ITaskProps) {
-  function handleTaskCompletion() {
-    onTaskStatusChange(task.id);
+
+  function handleTaskStatusChange() {
+    onTaskStatusChange(task);
 
     console.log(task);
   }
 
   function handleDeleteComment() {
-    onDeleteTask(task.id);
+    onDeleteTask(task._id!);
   }
 
   return(
@@ -30,13 +31,13 @@ export function Task({ task, onDeleteTask, onTaskStatusChange }: ITaskProps) {
       <div>
         <input 
           type="checkbox" 
-          id={`${task.id}-${task.description}}`} 
-          name={`${task.id}-${task.description}}`} 
+          id={task._id} 
+          name={task._id} 
           className={styles.checkbox} 
           checked={task.status} 
-          onChange={handleTaskCompletion} 
+          onChange={handleTaskStatusChange} 
         />
-        <label key={task.id} htmlFor={`${task.id}-${task.description}}`} />
+        <label key={task._id} htmlFor={task._id} />
         
         <p>{task.description}</p>
       </div>

@@ -1,29 +1,39 @@
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { ITask, Task } from "./Task";
 
 import styles from './TaskList.module.css'
+import { api } from "../services/api";
 
 export function TaskList() {
   const [tasks, setTasks] = useState<ITask[]>([]);
   const [tasksCompleted, setTasksCompleted] = useState<number>(0);
   const [newTaskText, setNewTaskText] = useState<string>('');
 
-  function handleCreateNewTask(event: FormEvent) {
-    event.preventDefault();
+  async function fetchData() {
+    const { data } = await api.get<ITask[]>('/todos');
 
-    const newTask = {
-      id: tasks.length + 1,
-      description: newTaskText,
-      status: false,
-    }
-
-    setTasks([...tasks, newTask]);
-    setNewTaskText('');
+    setTasks(data);
+    setTasksCompleted(data.filter(task => task.status === true).length);
   }
 
-  function countTasksCompleted() {
-    const tasksCompleted = tasks.filter(task => task.status === true);
-    setTasksCompleted(tasksCompleted.length);
+  useEffect(() => {
+    fetchData();
+  }, []);
+  
+
+  async function handleCreateNewTask(event: FormEvent) {
+    event.preventDefault();
+
+    await api.post<ITask>('/todos', {
+      description: newTaskText,
+      status: false,
+    }); 
+
+    const { data } = await api.get<ITask[]>('/todos');
+
+    setTasks(data);
+
+    setNewTaskText('');
   }
 
   function handleNewTaskTextchange(event: ChangeEvent<HTMLInputElement>) {
@@ -31,28 +41,28 @@ export function TaskList() {
     setNewTaskText(event.target.value);
   }
 
-  function handleTaskStatusChange(id: number) {
-    const newTasks = tasks.map(task => {
-      if(task.id === id) {
-        task.status = !task.status;
-      }
-
-      return task;
+  async function handleTaskStatusChange(task: ITask) {
+    await api.put(`/todos/${task._id}`, {
+      status: !task.status,
     });
 
-    countTasksCompleted();
-    setTasks(newTasks);
+    const { data } = await api.get<ITask[]>('/todos');
+
+    setTasksCompleted(data.filter(task => task.status === true).length);
+
+    setTasks(data);
   }
 
-  function deleteTask(id: number) {
-    const taskToDelete = tasks.find(task => task.id === id);
+  async function deleteTask(id: string) {
+    await api.delete(`/todos/${id}`);
     
-    if(taskToDelete?.status === true) {
-      setTasksCompleted(tasksCompleted - 1);
-    }
-
-    const newTasks = tasks.filter(task => task.id !== id);
+    const newTasks = tasks.filter(task => task._id !== id);
     setTasks(newTasks);
+  
+    const taskToDelete = tasks.find(task => task._id === id);
+    if (taskToDelete?.status === true) {
+      setTasksCompleted(tasksCompleted => tasksCompleted - 1);
+    }
   }
 
   return(
@@ -85,7 +95,7 @@ export function TaskList() {
         <div className={styles.taskList}>
           {tasks.map(task => {
             return <Task 
-              key={task.id} 
+              key={task._id} 
               task={task} 
               onDeleteTask={deleteTask}
               onTaskStatusChange={handleTaskStatusChange}
